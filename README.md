@@ -1,2 +1,2 @@
 # TIV
-Transfer Integrity Verificator
+Transfer Integrity Verifier
