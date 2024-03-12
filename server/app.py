@@ -34,14 +34,13 @@ def transaction():
     transaction = flask.request.json['originAccount'] +"    "+ flask.request.json['destinationAccount'] +"    "+ flask.request.json['amount'] +"    "+ flask.request.json['nonce']
     new_nonce = Transaction(transaction=transaction)
     if (db.session.query(Transaction).filter_by(transaction=transaction).first()):
-        with open('log_'+str(datetime.now().date())+'.txt', 'a') as file:
+        with open('logs/log_'+str(datetime.now().date())+'.txt', 'a') as file:
             file.write('This transaction is duplicated\n')
             file.write('Transaction:    ' + transaction + '\n\n')
         return Response("This transaction is duplicated", status = 400)
     
-    # TODO: Meter el log en la carpeta logs
     if (flask.request.json['hash'] != hmac.new(KEY.encode(), bytes(transaction.encode('utf-8')), "sha256").hexdigest()):
-        with open('log_'+str(datetime.now().date())+'.txt', 'a') as file:
+        with open('logs/log_'+str(datetime.now().date())+'.txt', 'a') as file:
             file.write('Invalid transaction hash\n')
             file.write('Transaction:    ' + transaction + '\n\n')
         return Response("Invalid hash", status=400)
