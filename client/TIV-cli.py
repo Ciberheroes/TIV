@@ -9,6 +9,8 @@ import signal
 import argparse
 import secrets
 import random
+import threading
+from datetime import datetime
 
 load_dotenv()
 SERVER_URL = os.getenv("SERVER_URL")
@@ -146,8 +148,17 @@ def multitest(numTest):
     print(f"Porcentaje respuestas esperadas: {expected_responses/total_transactions*100}%")
 
 def loadtest(numTest):
-    #TODO: Implementar un test de carga
-    pass
+    threads = []
+    initTime = datetime.now()
+    for _ in range(numTest):
+        thread = threading.Thread(target=transaction, args=("test_origin_account", "test_destiny_account", "100"))
+        thread.start()
+        threads.append(thread)
+
+    for thread in threads:
+        thread.join()
+    
+    print(f"Tiempo de ejecución: {datetime.now()-initTime}")
 
 if __name__ == "__main__": 
     signal.signal(signal.SIGINT, signal_handler)

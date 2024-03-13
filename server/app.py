@@ -50,4 +50,5 @@ def transaction():
     return Response("Transaction made successfully", status=200)
 
 if __name__ == '__main__':
+    load_dotenv()
     app.run(debug=True, host='localhost', port=5000)
