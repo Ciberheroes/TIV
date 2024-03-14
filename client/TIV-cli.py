@@ -33,6 +33,7 @@ def transaction(originAccount, destinationAccount, amount):
     headers = {'Content-type': 'application/json'}
     response = requests.post(url, data=json.dumps(data), headers=headers)
     print(f"{response.status_code}: {response.text}")
+    return response.status_code
 
 def hashtest():
     url = SERVER_URL + '/transaction'
@@ -47,6 +48,7 @@ def hashtest():
     headers = {'Content-type': 'application/json'}
     response = requests.post(url, data=json.dumps(data), headers=headers)
     print(f"{response.status_code}: {response.text}")
+    
 
 
 
@@ -148,17 +150,26 @@ def multitest(numTest):
     print(f"Porcentaje respuestas esperadas: {expected_responses/total_transactions*100}%")
 
 def loadtest(numTest):
+    trustworthy_transactions = 0
     threads = []
-    initTime = datetime.now()
+    
+    def transaction_test():
+        response = transaction("test_origin_account", "test_destiny_account", "100")
+        if response == 200:
+            nonlocal trustworthy_transactions
+            trustworthy_transactions += 1
+    
     for _ in range(numTest):
-        thread = threading.Thread(target=transaction, args=("test_origin_account", "test_destiny_account", "100"))
+        thread = threading.Thread(target=transaction_test)
         thread.start()
         threads.append(thread)
 
     for thread in threads:
         thread.join()
+
+    kpi = trustworthy_transactions / numTest
+    print(f"KPI: {kpi}")
     
-    print(f"Tiempo de ejecución: {datetime.now()-initTime}")
 
 if __name__ == "__main__": 
     signal.signal(signal.SIGINT, signal_handler)
@@ -178,19 +189,31 @@ if __name__ == "__main__":
         exit(1)
     
     if args.hashtest:
+        init_date = datetime.now()
         hashtest()
+        print("Tiempo de ejecución: ", datetime.now()-init_date)
         exit(1)
     
     if args.noncetest:
+        init_date = datetime.now()
         noncetest()
+        print("Tiempo de ejecución: ", datetime.now()-init_date)
         exit(1)
     
     if args.multitest:
+        init_date = datetime.now()
         multitest(int(args.multitest[0]))
+        print("Tiempo de ejecución: ", datetime.now()-init_date)
         exit(1)
 
     if args.loadtest:
+        init_date = datetime.now()
         loadtest(int(args.loadtest[0]))
+        print("Tiempo de ejecución: ", datetime.now()-init_date)
+        exit(1)
+
+    else:
+        parser.print_help()
         exit(1)
     
 
