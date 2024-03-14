@@ -162,6 +162,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     data = vars(args).values()
 
+    if not any(vars(args).values()):
+            parser.print_help()
     if args.transaction:
         transaction(*args.transaction)
         exit(1)
